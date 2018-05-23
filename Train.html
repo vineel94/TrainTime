@@ -5,43 +5,31 @@
     <meta charset = "UTF-8">
     <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type = "text/javascript" src = "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.js"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
-    </head>
+    
+</head>
   <body>
     <div class = "jumbotron"></div>
     <br>
 
     <div id = "train schedule">Current Train Schedule
-      <table>
+      <table id = "traintable">
           <tr>
-              <th>Train Name</th>
+              <th>Train Name </th>
               <th>Destination</th>
               <th>Frequency</th>
               <th>Next Arrival</th>
               <th>Minutes Away</th>
           </tr>
-          <tr>
-              <td>Austin Express</td>
-              <td>Roundrock</td>
-              <td>60</td>
-              <td>1:00AM</td>
-              <td>15</td>
-          </tr>
-          <tr>
-                <td>Austin Express</td>
-                <td>Roundrock</td>
-                <td>60</td>
-                <td>1:00AM</td>
-                <td>15</td>
-            </tr>
       </table>
     </div>
     <br>
 
     <div id = "addtrain">Add New Train
-      <form>
+      <form onsubmit= "addNewTrain()">
           <label for "Train Name">Train Name</label>
-          <input type = "text" id = "Train Name">
+          <input type = "text" id = "TrainName">
           <br>
 
           <label for "Destination">Destination</label>
@@ -49,7 +37,7 @@
           <br>
 
           <label for "First Train Time">First Train Time</label>
-          <input type = "text" id = "First Train Time">
+          <input type = "text" id = "FirstTrainTime">
           <br>
 
           <label for "Frequency">Frequency</label>
@@ -61,16 +49,54 @@
     </div>
 
   </body>
-
   <script type = "text/javascript">
-    var config = {
+  var vineelsTrain = "Mandava Express";
+  var myDestination = "Home";
+  var myFirstTrain = "12:30";
+  var myFrequency = 1;
+  var myNextArrival = 19;
+  var config = {
     apiKey: "AIzaSyD5P8z-PKSEPDJaLaBcO1DGcYsdbwhPlOc",
     authDomain: "trainapp-d7408.firebaseapp.com",
     databaseURL: "https://trainapp-d7408.firebaseio.com",
     projectId: "trainapp-d7408",
     storageBucket: "trainapp-d7408.appspot.com",
     messagingSenderId: "606672476455"
-    };
-    firebase.initializeApp(config);
+  };
+  firebase.initializeApp(config);
+  firebase.database().ref().on("child_added",function(snapshot){
+        var train = (snapshot.val());
+        vineelsTrain = train.newTrain.trainName;
+        myDestination = train.newTrain.destination;
+        myFrequency = train.newTrain.frequency;
+        myFirstTrain = train.newTrain.firstTrainTime;
+
+        var remainder = moment().diff(moment.unix(myFirstTrain),"minutes")%myFrequency;
+        var minutes = myFrequency - remainder;
+
+        myNextArrival = moment().add(minutes, "m").format("hh:mm A");
+        $("#traintable").append("<tr><td>" + vineelsTrain + "</td>  <td>" + myDestination+ "</td> <td>" + myFrequency + "</td> <td>" + myNextArrival + "</td> <td> " + minutes + "</td> </tr>");
+        
+        console.log(remainder);
+        console.log(minutes);
+        console.log(myNextArrival);
+    });
+ 
+  function addNewTrain(){
+      event.preventDefault();
+      var newTrain = {
+          trainName: $("#TrainName").val(),
+          destination: $("#Destination").val(),
+          firstTrainTime: moment($("#FirstTrainTime").val(), "HH:mm").subtract(10, "years").format("X"),
+          frequency: $("#Frequency").val()
+      }
+     
+      firebase.database().ref().push({
+        newTrain
+      });
+      
+  }
   </script>
+
+
 </html>
