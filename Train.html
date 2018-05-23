@@ -6,6 +6,7 @@
     <script src="https://www.gstatic.com/firebasejs/4.13.0/firebase.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script type = "text/javascript" src = "https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.1/moment.js"></script>
+    
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     
 </head>
@@ -47,56 +48,12 @@
           <button type = "submit">submit</button>
       </form>
     </div>
+    <script type = "text/javascript" src = "train.js"></script>
+       
 
+    </script>
   </body>
-  <script type = "text/javascript">
-  var vineelsTrain = "Mandava Express";
-  var myDestination = "Home";
-  var myFirstTrain = "12:30";
-  var myFrequency = 1;
-  var myNextArrival = 19;
-  var config = {
-    apiKey: "AIzaSyD5P8z-PKSEPDJaLaBcO1DGcYsdbwhPlOc",
-    authDomain: "trainapp-d7408.firebaseapp.com",
-    databaseURL: "https://trainapp-d7408.firebaseio.com",
-    projectId: "trainapp-d7408",
-    storageBucket: "trainapp-d7408.appspot.com",
-    messagingSenderId: "606672476455"
-  };
-  firebase.initializeApp(config);
-  firebase.database().ref().on("child_added",function(snapshot){
-        var train = (snapshot.val());
-        vineelsTrain = train.newTrain.trainName;
-        myDestination = train.newTrain.destination;
-        myFrequency = train.newTrain.frequency;
-        myFirstTrain = train.newTrain.firstTrainTime;
-
-        var remainder = moment().diff(moment.unix(myFirstTrain),"minutes")%myFrequency;
-        var minutes = myFrequency - remainder;
-
-        myNextArrival = moment().add(minutes, "m").format("hh:mm A");
-        $("#traintable").append("<tr><td>" + vineelsTrain + "</td>  <td>" + myDestination+ "</td> <td>" + myFrequency + "</td> <td>" + myNextArrival + "</td> <td> " + minutes + "</td> </tr>");
-        
-        console.log(remainder);
-        console.log(minutes);
-        console.log(myNextArrival);
-    });
- 
-  function addNewTrain(){
-      event.preventDefault();
-      var newTrain = {
-          trainName: $("#TrainName").val(),
-          destination: $("#Destination").val(),
-          firstTrainTime: moment($("#FirstTrainTime").val(), "HH:mm").subtract(10, "years").format("X"),
-          frequency: $("#Frequency").val()
-      }
-     
-      firebase.database().ref().push({
-        newTrain
-      });
-      
-  }
-  </script>
+  
 
 
 </html>
